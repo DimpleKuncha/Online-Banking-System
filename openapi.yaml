@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  title: Online Banking System API
+  version: 1.0.0
+  description: API documentation for the Online Banking System.
+paths:
+  /api/accounts:
+    post:
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '409':
+          description: Conflict in account creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: Retrieve all accounts
+      responses:
+        '200':
+          description: List of all accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+  /api/accounts/{accountNumber}:
+    get:
+      summary: Get details of a specific account
+      parameters:
+        - name: accountNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete an account
+      parameters:
+        - name: accountNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Account deleted successfully
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/transactions/transfer:
+    post:
+      summary: Transfer money between accounts
+      parameters:
+        - name: fromAccount
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: toAccount
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '201':
+          description: Money transferred successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+        accountHolderName:
+          type: string
+        balance:
+          type: number
+          format: double
+    Transaction:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        fromAccount:
+          type: string
+        toAccount:
+          type: string
+        amount:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
